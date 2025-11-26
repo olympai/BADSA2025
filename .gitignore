@@ -32,10 +32,10 @@ env/
 .ipynb_checkpoints
 
 # Models (large files)
-models/*.h5
-models/*.keras
-*.h5
-*.keras
+# models/*.h5
+# models/*.keras
+# *.h5
+# *.keras
 
 # Data files (can be large)
 *.csv

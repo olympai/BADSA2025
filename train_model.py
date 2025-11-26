@@ -6,6 +6,8 @@ Dataset: HAM10000
 import os
 import pandas as pd
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 from pathlib import Path
 import tensorflow as tf
@@ -18,14 +20,33 @@ from sklearn.utils import class_weight
 import warnings
 warnings.filterwarnings('ignore')
 
+# Configure TensorFlow for better memory management
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # Show warnings
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN optimizations
+os.environ['GRPC_VERBOSITY'] = 'ERROR'  # Reduce gRPC logging
+os.environ['GRPC_TRACE'] = ''  # Disable gRPC tracing
+
+# Force CPU-only for stability (Metal GPU can cause issues on Mac)
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'  # Disable CUDA
+os.environ['TF_CPP_MIN_VLOG_LEVEL'] = '0'
+
+print("Configuring TensorFlow...")
+
+# Limit CPU threads to avoid lock issues
+tf.config.threading.set_intra_op_parallelism_threads(2)
+tf.config.threading.set_inter_op_parallelism_threads(2)
+
+print("TensorFlow configured for CPU with limited threading")
+
 # Set random seeds for reproducibility
 np.random.seed(42)
 tf.random.set_seed(42)
 
-# Configuration
+# Configuration - Reduced settings for memory efficiency
 IMG_SIZE = 224
-BATCH_SIZE = 32
-EPOCHS = 20
+BATCH_SIZE = 16  # Reduced from 32 to save memory
+EPOCHS = 15  # Reduced from 20 for faster training
+FINE_TUNE_EPOCHS = 5  # Reduced from 10
 LEARNING_RATE = 0.0001
 
 # Class labels
@@ -234,7 +255,7 @@ print("Fine-tuning model...")
 history_fine = model.fit(
     train_generator,
     validation_data=val_generator,
-    epochs=10,
+    epochs=FINE_TUNE_EPOCHS,
     callbacks=callbacks,
     class_weight=class_weights_dict,
     verbose=1

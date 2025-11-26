@@ -170,8 +170,8 @@ if uploaded_file is not None:
                 st.markdown(f"""
                 <div style="padding: 20px; border-radius: 10px; background-color: #f0f2f6; margin: 10px 0;">
                     <h3 style="color: {color}; margin: 0;">Vorhersage: {top_result['class_name']}</h3>
-                    <p style="font-size: 24px; margin: 10px 0;"><b>{confidence:.1f}%</b> Konfidenz</p>
-                    <p style="color: #666; margin: 0;">Klasse: {top_result['class_key']}</p>
+                    <p style="font-size: 32px; font-weight: bold; color: #000; margin: 10px 0;">{confidence:.1f}% <span style="font-size: 20px;">Konfidenz</span></p>
+                    <p style="color: #555; margin: 0;">Klasse: {top_result['class_key']}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -180,7 +180,7 @@ if uploaded_file is not None:
 
                 for result in results:
                     prob_percent = result['probability'] * 100
-                    st.progress(result['probability'])
+                    st.progress(float(result['probability']))
                     st.markdown(f"""
                     **{result['class_name']}** ({result['class_key']})
                     <span style="float: right;">{prob_percent:.2f}%</span>
