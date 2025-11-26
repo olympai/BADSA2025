@@ -14,6 +14,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
@@ -123,7 +124,7 @@ for idx, class_name in enumerate(class_names_list):
 # Data augmentation
 print("\n[4/9] Setting up data augmentation...")
 train_datagen = ImageDataGenerator(
-    rescale=1./255,
+    preprocessing_function=preprocess_input,
     rotation_range=15,
     width_shift_range=0.15,
     height_shift_range=0.15,
@@ -133,7 +134,7 @@ train_datagen = ImageDataGenerator(
     fill_mode='nearest'
 )
 
-val_test_datagen = ImageDataGenerator(rescale=1./255)
+val_test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
 
 train_generator = train_datagen.flow_from_dataframe(
     dataframe=train_df,
@@ -378,6 +379,54 @@ for idx, class_name in enumerate(target_names):
     if class_name in DANGEROUS_CLASSES:
         recall = cm[idx, idx] / cm[idx, :].sum() if cm[idx, :].sum() > 0 else 0
         print(f"  {CLASS_NAMES[class_name]:30s}: {recall*100:.1f}% recall ⚠️")
+
+# Per-class AUC
+print("\n" + "=" * 60)
+print("Per-Class AUC (One-vs-Rest):")
+print("=" * 60)
+from sklearn.metrics import roc_auc_score
+from sklearn.preprocessing import label_binarize
+
+# Binarize the labels for one-vs-rest AUC calculation
+y_true_binarized = label_binarize(y_true, classes=range(len(target_names)))
+per_class_auc = {}
+
+for idx, class_name in enumerate(target_names):
+    try:
+        auc_score = roc_auc_score(y_true_binarized[:, idx], predictions[:, idx])
+        per_class_auc[class_name] = auc_score
+        danger_marker = "⚠️" if class_name in DANGEROUS_CLASSES else ""
+        print(f"  {CLASS_NAMES[class_name]:30s}: {auc_score:.4f} {danger_marker}")
+    except ValueError:
+        per_class_auc[class_name] = 0.0
+        print(f"  {CLASS_NAMES[class_name]:30s}: N/A (no samples)")
+
+# Plot per-class AUC
+print("\nGenerating per-class AUC plot...")
+plt.figure(figsize=(12, 6))
+class_labels = [CLASS_NAMES[name] for name in target_names]
+auc_values = [per_class_auc[name] for name in target_names]
+colors = ['#d62728' if name in DANGEROUS_CLASSES else '#1f77b4' for name in target_names]
+
+bars = plt.bar(range(len(class_labels)), auc_values, color=colors, alpha=0.8, edgecolor='black')
+plt.xlabel('Class', fontsize=12, fontweight='bold')
+plt.ylabel('AUC Score', fontsize=12, fontweight='bold')
+plt.title('Per-Class AUC (One-vs-Rest)\nRed = Dangerous (Cancer) Classes', fontsize=14, fontweight='bold')
+plt.xticks(range(len(class_labels)), class_labels, rotation=45, ha='right')
+plt.ylim(0, 1.0)
+plt.axhline(y=0.5, color='gray', linestyle='--', linewidth=1, alpha=0.5, label='Random Baseline')
+plt.grid(axis='y', alpha=0.3)
+plt.legend()
+
+# Add value labels on bars
+for i, (bar, value) in enumerate(zip(bars, auc_values)):
+    height = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+             f'{value:.3f}', ha='center', va='bottom', fontsize=9, fontweight='bold')
+
+plt.tight_layout()
+plt.savefig('models/per_class_auc.png', dpi=150, bbox_inches='tight')
+print("Per-class AUC plot saved to 'models/per_class_auc.png'")
 
 # Save final model
 model.save('models/final_model_recall.h5')
