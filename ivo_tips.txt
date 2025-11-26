@@ -1,0 +1,6 @@
+- adaptive learning rate
+- batch size
+- other model to pre-classify if its skin or not
+- focus on the few classes with highest recall
+- look up competition results from others on kaggle
+- mobilenetv3?
