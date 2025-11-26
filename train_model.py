@@ -195,7 +195,7 @@ print("\n[5/8] Setting up training callbacks...")
 callbacks = [
     keras.callbacks.ModelCheckpoint(
         'models/best_model.h5',
-        monitor='val_accuracy',
+        monitor='val_recall',
         save_best_only=True,
         mode='max',
         verbose=1
