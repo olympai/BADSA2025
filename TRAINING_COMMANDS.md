@@ -23,7 +23,7 @@ ps -o etime= -p $(pgrep -f "python train_model.py")
 
 ```bash
 # Follow training log (if using log file)
-tail -f training.log
+tail -f training_recall.log
 
 # Watch with auto-refresh every 2 seconds
 watch -n 2 './monitor_training.sh'
