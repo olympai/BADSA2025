@@ -15,6 +15,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 import warnings
@@ -109,7 +110,7 @@ print("\nClass weights calculated for imbalanced dataset")
 # Data augmentation for training
 print("\n[3/8] Setting up data augmentation...")
 train_datagen = ImageDataGenerator(
-    rescale=1./255,
+    preprocessing_function=preprocess_input,
     rotation_range=20,
     width_shift_range=0.2,
     height_shift_range=0.2,
@@ -120,7 +121,7 @@ train_datagen = ImageDataGenerator(
 )
 
 # Only rescaling for validation and test
-val_test_datagen = ImageDataGenerator(rescale=1./255)
+val_test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input)
 
 # Create data generators
 train_generator = train_datagen.flow_from_dataframe(
