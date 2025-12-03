@@ -6,3 +6,9 @@
 - look up competition results from others on kaggle
 - mobilenetv3?
 - prettier application
+
+- resnet 18
+- split falsch, validation set zu klein, nicht randomisiert, pattern (nicht gefunden)
+- outlayer: flasch klassifiziert anscheune, splits von kaggle anschauen, Datenbeschreibung
+
+- Dokumentation schreiben?
