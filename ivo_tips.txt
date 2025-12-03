@@ -12,3 +12,7 @@
 - outlayer: flasch klassifiziert anscheune, splits von kaggle anschauen, Datenbeschreibung
 
 - Dokumentation schreiben?
+
+Presentation:
+- readme.md with how to use, packages to install
+- documentation important
