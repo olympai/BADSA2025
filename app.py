@@ -1,8 +1,10 @@
 """
+BADSA 2025 Group 3
 Streamlit App for Skin Cancer Classification
 Using trained MobileNetV2 model
 """
 
+# Here we initiate the libraries we need
 import streamlit as st
 import tensorflow as tf
 from tensorflow import keras
@@ -20,8 +22,8 @@ st.set_page_config(
 
 # Constants
 IMG_SIZE = 224
-MODEL_PATH = 'models/final_model.h5'
-CLASS_NAMES_PATH = 'models/class_names.json'
+MODEL_PATH = 'models/final_model.h5' # This is the directory we used to save our best trained model
+CLASS_NAMES_PATH = 'models/class_names.json' # This is the directory for the class names
 
 @st.cache_resource
 def load_model():
