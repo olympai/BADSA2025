@@ -1,18 +1,15 @@
 - adaptive learning rate
 - batch size
 --> implement tracking for different performance metrics
-- other model to pre-classify if its skin or not
 - focus on the few classes with highest recall
-- look up competition results from others on kaggle
-- mobilenetv3?
-- prettier application
 
-- resnet 18
 - split falsch, validation set zu klein, nicht randomisiert, pattern (nicht gefunden)
 - outlayer: flasch klassifiziert anscheune, splits von kaggle anschauen, Datenbeschreibung
-
-- Dokumentation schreiben?
 
 Presentation:
 - readme.md with how to use, packages to install
 - documentation important
+
+Streamlit App:
+- korrektes Formatieren Bilder beim Upload
+- Frontend Improvements
