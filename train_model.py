@@ -182,7 +182,7 @@ print(f"Base model loaded: {len(base_model.layers)} layers frozen")
 model = keras.Sequential([
     base_model, # The base model that was freezed above
     layers.GlobalAveragePooling2D(), # Converts the 2D feature maps into single 1D vector per image. Reduces parameters
-    layers.Dropout(0.5), # Randomly sets 50% of the neurons to 0 during training. Helps woth overfitting
+    layers.Dropout(0.5), # Randomly sets 50% of the neurons to 0 during training. Helps with overfitting
     layers.Dense(256, activation='relu'), # Fully connected layer with 256 neurons. Learns nonlinear combinations. relu keeps training fast and stable
     layers.BatchNormalization(), # Normalizes activations form the dense layer and also stabilized training
     layers.Dropout(0.3), # Another dropoutlayer after batch normalization
