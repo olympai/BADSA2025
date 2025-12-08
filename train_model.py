@@ -23,6 +23,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Before we start working on the code for the model we first need to make sure our Macs don't blow up while training, so we adjust some settings here
+# and make sure we get the maximum out of our laptops computing capabilities
 # Configure TensorFlow for readability and sensory overload management
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # Show warnings only. Otherwise we would be getting spammed
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN optimizations. Disabled because on Mac it can cause issues
@@ -65,7 +66,9 @@ print("=" * 60)
 print("Skin Cancer Classification - MobileNetV2 Transfer Learning")
 print("=" * 60)
 
-# Here we start to introduce the dataset and do some preprocessing
+# Here we start to introduce the dataset and do some preprocessing. We also want to see some minor statistics to see the extent of the dataset
+# It is important to see how the distribution of the classes is as this might lead to problems later on regarding accuracy. As we will see the
+# distribution of the classes is not uniform. There exist classes with many entries whereas there are others woth very few entries.
 # Load the dataset
 print("\nLoading metadata")
 metadata = pd.read_csv('data/HAM10000_metadata.csv')
@@ -89,12 +92,12 @@ def get_image_path(image_id):
 
 # This here created a new column called "path", where each row contains the file path corresponding to its image
 metadata['path'] = metadata['image_id'].apply(get_image_path)
-metadata = metadata.dropna(subset=['path']) # Here we drop any entries where no matching image was found
+metadata = metadata.dropna(subset=['path']) # Here we drop any entries where no matching image was found. Including them would make no sense as we want to classify images and if there are none the model can not train properly.
 print(f"Valid images found: {len(metadata)}")
 
 # Split data
 print("\nSplitting data into train/validation/test sets")
-train_df, temp_df = train_test_split(metadata, test_size=0.3, random_state=42, stratify=metadata['dx']) # The temp_df is next used to split into the validation and test sample
+train_df, temp_df = train_test_split(metadata, test_size=0.3, random_state=42, stratify=metadata['dx']) # The temp_df is next used to split into the validation and test sample. We used a split size of 0.3 because that is the standard and we have sufficient data to work with for validation/testing
 val_df, test_df = train_test_split(temp_df, test_size=0.5, random_state=42, stratify=temp_df['dx']) # Both are equally split. So they both total 15% of the total Dataset
 
 print(f"Training samples: {len(train_df)}")
@@ -102,16 +105,16 @@ print(f"Validation samples: {len(val_df)}")
 print(f"Test samples: {len(test_df)}")
 
 # Calculate class weights for imbalanced dataset. We see that there are classes that turn up more in the dataset and others that are quite rare.
-# Because the model sees mostly dominant classes, it tend to ignore the rare ones. Thus we have to correct this
+# Because the model sees mostly dominant classes, it tends to ignore the rare ones. Thus we have to correct this by assigning bigger weights to "rarer" classes
 class_weights_values = class_weight.compute_class_weight(
-    'balanced', # This computes weights so that rare classes get higher weight and common classes get lower weights
+    'balanced', # This computes weights so that rare classes get higher weights and common classes get lower weights. This is made to optimize the model. When validating/testing, a false prediction for a rare class would not be very tragic. The model might never predict the rare classes and still have high accuracy/low RMSE.
     classes=np.unique(train_df['dx']),
     y=train_df['dx']
 )
 class_weights_dict = dict(enumerate(class_weights_values)) # Convert the class weights as a dictionary
 print("\nClass weights calculated for imbalanced dataset")
 
-# Data augmentation for training. Augmentation increases the dataset diversity and helps prevent overfitting
+# Data augmentation for training. Augmentation increases the dataset diversity and helps prevent overfitting. We also generate more pictures for the model to train on while also accounting for some potential human errors when taking the pictures. It is important to note that only the images for the training set will be augmented. The rest will remain the same as we need them for testing/validation
 print("\nSetting up data augmentation")
 train_datagen = ImageDataGenerator(
     preprocessing_function=preprocess_input,
@@ -127,7 +130,7 @@ train_datagen = ImageDataGenerator(
 # Only rescaling for validation and test
 val_test_datagen = ImageDataGenerator(preprocessing_function=preprocess_input) # The images of the test and validation set should not be augmented as we want true, unmodifies images for evaluating the model
 
-# Create data generators. As we see only on the train-set augmentation is applied.
+# Create data generators. As we see only on the train-set augmentation is applied. Now for the training-set we have a more diverse set of pictures.
 train_generator = train_datagen.flow_from_dataframe(
     dataframe=train_df,
     x_col='path',
@@ -149,7 +152,7 @@ val_generator = val_test_datagen.flow_from_dataframe(
     shuffle=False
 )
 
-# Here also so augmentation
+# Here also no augmentation
 test_generator = val_test_datagen.flow_from_dataframe(
     dataframe=test_df,
     x_col='path',
@@ -163,7 +166,6 @@ test_generator = val_test_datagen.flow_from_dataframe(
 print(f"Classes: {train_generator.class_indices}")
 
 # Now we finally start with building the model
-# Build model with MobileNetV2
 print("\nBuilding MobileNetV2 model with Transfer Learning")
 
 # Load pre-trained MobileNetV2 (without top layer)
@@ -185,8 +187,8 @@ model = keras.Sequential([
     layers.Dropout(0.5), # Randomly sets 50% of the neurons to 0 during training. Helps with overfitting
     layers.Dense(256, activation='relu'), # Fully connected layer with 256 neurons. Learns nonlinear combinations. relu keeps training fast and stable
     layers.BatchNormalization(), # Normalizes activations form the dense layer and also stabilized training
-    layers.Dropout(0.3), # Another dropoutlayer after batch normalization
-    layers.Dense(len(CLASS_NAMES), activation='softmax') # Final output layer. Softmay activation converts logits to probabilities for each class
+    layers.Dropout(0.3), # Another dropout-layer after batch normalization
+    layers.Dense(len(CLASS_NAMES), activation='softmax') # Final output layer. Softmax activation converts logits to probabilities for each class
 ])
 
 # Compile model
@@ -204,7 +206,7 @@ print("\nSetting up training callbacks")
 callbacks = [
     keras.callbacks.ModelCheckpoint(
         'models/best_model.h5', # The best model is saved under this directory
-        monitor='val_recall', # This monitors the calidation recall at the end of every epoch
+        monitor='val_recall', # This monitors the validation recall at the end of every epoch
         save_best_only=True,
         mode='max',
         verbose=1
@@ -278,7 +280,7 @@ test_results = model.evaluate(test_generator, verbose=1) # Runs the trained mode
 print("\nTest Results:")
 print(f"Loss: {test_results[0]:.4f}") # Shows how well predicitons match the true labels
 print(f"Accuracy: {test_results[1]:.4f}") # Basic measure of performance
-print(f"AUC: {test_results[2]:.4f}") # Measures ability to distinguish classes, robust for imbaanced data
+print(f"AUC: {test_results[2]:.4f}") # Measures ability to distinguish classes, robust for imbalanced data
 print(f"Precision: {test_results[3]:.4f}") # This is important for when false positives are costly
 print(f"Recall: {test_results[4]:.4f}") # This is more important for us as this shows the correct positive predictions over all actual positive predictions
 
