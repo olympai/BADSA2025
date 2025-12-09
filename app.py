@@ -3,6 +3,7 @@ BADSA 2025 Group 3
 Streamlit App for Skin Cancer Classification
 Using trained MobileNetV2 model
 Enhanced with advanced features
+The creation of this code was assisted by Claude AI
 """
 
 # Here we initiate the libraries we need
