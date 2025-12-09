@@ -63,7 +63,7 @@ def load_class_names():
         }
     with open(CLASS_NAMES_PATH, 'r') as f:
         return json.load(f)
-
+#define details for each condition
 @st.cache_data
 def get_condition_details():
     """Get detailed information about each condition"""
@@ -139,7 +139,7 @@ def get_condition_details():
             'emoji': '🟢'
         }
     }
-
+#function to change image parameters
 def apply_image_adjustments(image, brightness=1.0, contrast=1.0, rotation=0):
     """Apply adjustments to image"""
     # Brightness
@@ -157,7 +157,7 @@ def apply_image_adjustments(image, brightness=1.0, contrast=1.0, rotation=0):
         image = image.rotate(rotation, expand=True)
 
     return image
-
+#creating the confidence visualization
 def create_confidence_chart(results):
     """Create an interactive confidence chart"""
     df = pd.DataFrame(results)
@@ -182,7 +182,7 @@ def create_confidence_chart(results):
     )
 
     return fig
-
+#risk level for each type
 def create_risk_gauge(risk_level):
     """Create a gauge chart for risk level"""
     risk_values = {
@@ -217,7 +217,7 @@ def create_risk_gauge(risk_level):
 
     fig.update_layout(height=300)
     return fig
-
+#preprocess image before making prediction to fit the mobilenet requirements
 def preprocess_image(image):
     """Preprocess image for model prediction using MobileNetV2 preprocessing"""
     # Convert to RGB if necessary
