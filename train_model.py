@@ -308,6 +308,11 @@ plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.legend()
 plt.grid(True)
+# Suprisingly we see that the Train Accuracy is constantly lower than the Validation Accuracy. At first this is very weird and also cost us a lot of time trying to figure out why that is.
+# We first thought the model is not good enough and than trained a more difficult model (resnet) which weirdly enough presented the same results. We than tried to understand why that is and the solution is very trivial.
+# Because we only augment the training dataset and dont augment on the validation/test dataset, it is more difficult for the model in the training set to correctly classify. Additionally we allocated more weights to rarer classes.
+# This means that additionally to having it more difficult to correctly predict. It gets penalized more for wrongly classifying. This makes the model better when classifying on the images form the validation/test set.
+# This is the reason for the better performance on the Accuracy.
 
 # Loss
 plt.subplot(1, 3, 2)
@@ -318,6 +323,8 @@ plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
 plt.grid(True)
+# We can see that the loss for the training set is constantly above the validation loss. The same logic applies here as for the accuracy. Due to the augmentation and the additional weighting of rarer classes it is harder for the model to correctly predict,
+# resulting in higher loss for the training set. We can also see that with further fine-tuning the models performance gets better for training and validation set, but it slowly starts to slow down.
 
 # AUC
 plt.subplot(1, 3, 3)
@@ -328,6 +335,9 @@ plt.xlabel('Epoch')
 plt.ylabel('AUC')
 plt.legend()
 plt.grid(True)
+# Here we also see that the training AUC is constantly lower than the validation AUC. Again the same logic applies. What the AUC shows is how well the model can distinguish between classes.
+# The AUC is the are under the ROC curve which plots the Recall against the false positive rate. In the validation we get to a model AUC of 0.9 which is good. AUC is important because the dataset is heavily imbalanced, so accuracy alone is misleading.
+# Although the performance for the training is not the best, the fact there is such a big gap between training and validation tells us the augmentation trains the model well to then classify in the real world where images should be well taken but can be distorted.
 
 plt.tight_layout()
 plt.savefig('models/training_history.png', dpi=150, bbox_inches='tight')
