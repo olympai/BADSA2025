@@ -2,6 +2,7 @@
 # BADSA 2025 Capstone-Project Group 3.
 # Model used to train: MobileNetV2
 # Dataset: HAM10000
+# The creation of this code was assisted by Claude AI
 
 # Here we load in all libraries we need
 import os

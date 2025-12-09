@@ -9,6 +9,7 @@ Dieses Projekt verwendet Transfer Learning mit MobileNetV2, um Hautläsionen zu 
 - **Datensatz**: HAM10000 (ca. 10.000 dermatoskopische Bilder)
 - **Klassen**: 7 verschiedene Hautläsionstypen
 - **Interface**: Streamlit Web-Anwendung
+- **Disclaimer**: Der Code in diesem GitHun Repository wurde mithilfe von Claude AI generiert
 
 ## Klassifizierte Hautläsionen
 
