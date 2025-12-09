@@ -9,6 +9,7 @@ Enhanced with advanced features
 import streamlit as st
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 import numpy as np
 from PIL import Image, ImageEnhance, ImageOps
 import json
@@ -218,7 +219,7 @@ def create_risk_gauge(risk_level):
     return fig
 
 def preprocess_image(image):
-    """Preprocess image for model prediction"""
+    """Preprocess image for model prediction using MobileNetV2 preprocessing"""
     # Convert to RGB if necessary
     if image.mode != 'RGB':
         image = image.convert('RGB')
@@ -226,14 +227,14 @@ def preprocess_image(image):
     # Resize to model input size
     image = image.resize((IMG_SIZE, IMG_SIZE))
 
-    # Convert to array and normal
-    # 
-    # ize
+    # Convert to array
     img_array = np.array(image)
-    img_array = img_array / 255.0
 
     # Add batch dimension
     img_array = np.expand_dims(img_array, axis=0)
+
+    # Apply MobileNetV2 preprocessing (scales to [-1, 1])
+    img_array = preprocess_input(img_array)
 
     return img_array
 

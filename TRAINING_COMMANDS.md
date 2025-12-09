@@ -77,20 +77,3 @@ df -h .
 free -h  # Linux
 vm_stat  # macOS
 ```
-
-## Current Training Info
-
-- **Dataset**: HAM10000 (~10,000 images)
-- **Batch size**: 16
-- **Initial epochs**: 15
-- **Fine-tuning epochs**: 5
-- **Total training time**: ~19 hours on CPU
-- **Model saves to**: `models/best_model.h5`
-
-## Tips
-
-1. Use `nohup` if you want training to continue after closing terminal
-2. Always check `models/` directory for saved checkpoints
-3. The best model is automatically saved based on validation accuracy
-4. Use `tail -f training.log` for live monitoring
-5. Training can be stopped and resumed (model checkpoints are saved)
