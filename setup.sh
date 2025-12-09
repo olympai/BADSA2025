@@ -23,7 +23,17 @@ source venv/bin/activate
 echo "Upgrading pip..."
 pip install --upgrade pip
 
-# Install dependencies
+# Install tensorflow explicitly first (critical dependency)
+echo "Installing tensorflow..."
+pip install "tensorflow>=2.13.0"
+
+# Check if tensorflow installation was successful
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to install tensorflow"
+    exit 1
+fi
+
+# Install remaining dependencies
 echo "Installing dependencies from requirements.txt..."
 pip install -r requirements.txt
 
