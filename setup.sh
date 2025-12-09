@@ -36,8 +36,7 @@ if [ $? -eq 0 ]; then
     echo "To deactivate, run:"
     echo "  deactivate"
     echo ""
-    echo "Starting Streamlit app..."
-    streamlit run app.py
+    
 else
     echo "Error: Failed to install dependencies"
     exit 1

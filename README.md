@@ -45,6 +45,11 @@ source venv/bin/activate  # Auf Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+
+oder einfach 
+  ./setup.sh
+ausführen
+
 ## Datenstruktur
 
 Der HAM10000-Datensatz sollte folgende Struktur haben:
@@ -109,10 +114,6 @@ Starte die Web-Anwendung:
 ```bash
 streamlit run app.py
 ```
-
-oder einfach 
-  ./setup.sh
-ausführen
 
 Die App öffnet sich automatisch im Browser (normalerweise unter `http://localhost:8501`).
 
