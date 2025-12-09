@@ -110,6 +110,10 @@ Starte die Web-Anwendung:
 streamlit run app.py
 ```
 
+oder einfach 
+  ./setup.sh
+ausführen
+
 Die App öffnet sich automatisch im Browser (normalerweise unter `http://localhost:8501`).
 
 ### Schritt 3: Bilder klassifizieren
